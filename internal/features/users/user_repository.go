@@ -1,10 +1,10 @@
-package repository
+package users
 
 import (
-	"RestApiBackend/internal/features/users/domain"
+	"RestApiBackend/internal/features/users/entities"
 	"context"
 )
 
 type UserRepository interface {
-	GetUserByEmail(ctx context.Context, email string) (*domain.User, error)
+	FetchUserByEmail(ctx context.Context, email string) (*entities.User, error)
 }

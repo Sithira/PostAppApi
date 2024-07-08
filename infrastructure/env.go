@@ -1,4 +1,4 @@
-package boostrap
+package infrastructure
 
 import (
 	"github.com/spf13/viper"

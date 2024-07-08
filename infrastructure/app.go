@@ -1,17 +1,28 @@
-package boostrap
+package infrastructure
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type Application struct {
 	Env *Env
 }
 
-func App() Application {
-	app := &Application{}
-	app.Env = NewEnv()
-	return *app
-}
+func App() (*Application, *sql.DB) {
 
-func (App *Application) closeDBConnection() {
-	fmt.Println("DB connection close called.")
+	app := &Application{
+		Env: NewEnv(),
+	}
+
+	dbConnection, err := (&PostgresConnector{
+		Env: app.Env,
+	}).Connect()
+
+	if err != nil {
+		fmt.Printf("Unable to connect to database %s\n", err)
+		panic("DB connection error")
+	}
+
+	return app, dbConnection
 }

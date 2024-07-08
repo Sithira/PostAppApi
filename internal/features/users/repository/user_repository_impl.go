@@ -1,8 +1,8 @@
-package postgres
+package repository
 
 import (
-	"RestApiBackend/internal/features/users/domain"
-	"RestApiBackend/internal/features/users/repository"
+	"RestApiBackend/internal/features/users"
+	"RestApiBackend/internal/features/users/entities"
 	"context"
 	"database/sql"
 )
@@ -11,16 +11,24 @@ type userRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) repository.UserRepository {
+func NewUserRepository(db *sql.DB) users.UserRepository {
 	return &userRepository{
 		db: db,
 	}
 }
 
-func (r userRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
-	result := r.db.QueryRow("SELECT * FROM users u WHERE u.email = :email AND u.deleted_at IS NULL")
-	if result == nil {
+func (r *userRepository) FetchUserByEmail(ctx context.Context, email string) (*entities.User, error) {
+	user := entities.User{}
 
+	statements, err := r.db.PrepareContext(ctx, "SELECT * FROM users u WHERE u.email = $1 AND u.deleted_at IS NULL")
+
+	if err != nil {
+		return nil, err
 	}
-	return nil, nil
+
+	if err := statements.QueryRowContext(ctx, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
