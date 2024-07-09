@@ -1,0 +1,11 @@
+package http
+
+import (
+	"RestApiBackend/internal/features/posts"
+	"github.com/gin-gonic/gin"
+)
+
+func NewPostRouter(h posts.Handler, group *gin.RouterGroup) {
+	group.GET("", h.GetPostsForUser())
+	group.POST("", h.CreatePostForUser())
+}

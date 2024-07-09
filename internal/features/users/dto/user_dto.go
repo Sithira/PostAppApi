@@ -6,16 +6,17 @@ import (
 )
 
 type UserCreateRequest struct {
-	FullName    string `json:"fullname"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 }
 
 type UserCreateResponse struct {
-	UserID    int64  `json:"user_id"`
-	Token     string `json:"token"`
-	ExpiredAt int64  `json:"expired_at"`
+	UserID       int64  `json:"user_id"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiredAt    int64  `json:"expired_at"`
 }
 
 type UserResponse struct {

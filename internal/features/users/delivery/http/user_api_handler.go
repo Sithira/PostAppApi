@@ -28,9 +28,6 @@ func (uc *userHandler) GetUserDetails() gin.HandlerFunc {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
-		context.JSON(http.StatusOK, gin.H{
-			"message": "User retrieved successfully",
-			"data":    username,
-		})
+		context.JSON(http.StatusOK, username)
 	}
 }

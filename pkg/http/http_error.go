@@ -15,9 +15,9 @@ type RestErr interface {
 
 // RestError Rest error struct
 type RestError struct {
-	Code             int         `json:"code"`
-	ErrorCode        string      `json:"status,omitempty"`
-	ErrorDescription string      `json:"error,omitempty"`
+	Code             int         `json:"code,omitempty"`
+	ErrorCode        string      `json:"error"`
+	ErrorDescription string      `json:"error_description"`
 	ErrCauses        interface{} `json:"-"`
 }
 
@@ -27,8 +27,15 @@ func (e RestError) Error() string {
 
 func NewBadRequest(causes interface{}) RestError {
 	return RestError{
+		ErrorCode:        errors.New(causes.(string)).Error(),
+		ErrorDescription: "",
+	}
+}
+
+func NewInternalServerError(causes interface{}) RestError {
+	return RestError{
 		Code:             http.StatusBadRequest,
-		ErrorCode:        errors.New("Bad Request").Error(),
+		ErrorCode:        errors.New("Internal Server Error").Error(),
 		ErrorDescription: "",
 	}
 }

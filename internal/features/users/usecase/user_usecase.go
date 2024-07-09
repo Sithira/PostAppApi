@@ -20,11 +20,11 @@ func NewUserUserCase(repository users.UserRepository) users.UseCase {
 }
 
 func (uc clientUseCase) GetUserByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
-	byEmail, err := uc.userRepository.FetchUserByEmail(ctx, email)
+	user, err := uc.userRepository.FetchUserByEmail(ctx, email)
 	if err != nil {
 		return nil, http.NewBadRequest(errors.Wrap(err, ""))
 	}
-	return toUserResponse(byEmail), nil
+	return toUserResponse(user), nil
 }
 
 func toUserResponse(user *entities.User) *dto.UserResponse {
