@@ -1,0 +1,9 @@
+### GET request to example server
+POST http://localhost:9000/api/v1/posts?userId=e8a61f05-1f82-4dfd-b36d-145c45f2bde8
+Content-Type: application/json
+
+{
+  "title": "Test title",
+  "body_text": "Pukah"
+}
+###

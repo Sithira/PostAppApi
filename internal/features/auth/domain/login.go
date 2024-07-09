@@ -16,11 +16,6 @@ type SuccessLoginResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-type LoginUseCase interface {
-	GetAccessToken(c context.Context, email string) (SuccessLoginResponse, error)
-	RefreshToken(c context.Context, refreshToken string) (SuccessLoginResponse, error)
-}
-
 type RegisterUseCase interface {
 	RegisterUser(c context.Context)
 }

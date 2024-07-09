@@ -16,8 +16,7 @@ type Env struct {
 	DBName                 string `mapstructure:"DB_NAME"`
 	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
 	RefreshTokenExpiryHour int    `mapstructure:"REFRESH_TOKEN_EXPIRY_HOUR"`
-	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
-	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
+	TokenSignerKey         string `mapstructure:"TOKEN_SIGNER_KEY"`
 }
 
 func NewEnv() *Env {

@@ -5,6 +5,7 @@ import (
 	"RestApiBackend/internal/features/users/entities"
 	"context"
 	"database/sql"
+	"github.com/pkg/errors"
 )
 
 type userRepository struct {
@@ -23,11 +24,11 @@ func (r *userRepository) FetchUserByEmail(ctx context.Context, email string) (*e
 	statements, err := r.db.PrepareContext(ctx, "SELECT * FROM users u WHERE u.email = $1 AND u.deleted_at IS NULL")
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "authRepository.FetchUserByEmail.PrepareContext")
 	}
 
 	if err := statements.QueryRowContext(ctx, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "authRepository.FetchUserByEmail.QueryRowContext")
 	}
 
 	return &user, nil
