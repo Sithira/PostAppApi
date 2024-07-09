@@ -24,6 +24,7 @@ func (p postUseCase) GetPostsForUser() gin.HandlerFunc {
 		fetchPosts, err := p.us.FetchPosts(context)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, nil)
+			return
 		}
 		context.JSON(http.StatusOK, fetchPosts)
 		return
