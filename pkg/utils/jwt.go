@@ -3,7 +3,6 @@ package utils
 import (
 	"RestApiBackend/infrastructure"
 	"RestApiBackend/internal/features/users/entities"
-	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -25,7 +24,7 @@ func GenerateLoginToken(app *infrastructure.Application, user *entities.User) (*
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"subject":   user.ID.String(),
 		"email":     user.Email,
-		"full_name": fmt.Printf("%s %s", user.FirstName, user.LastName),
+		"full_name": user.FirstName + " " + user.LastName,
 		"exp":       time.Now().Add(time.Minute * 60).Unix(),
 		"iat":       time.Now().Unix(),
 	})

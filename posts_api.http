@@ -7,3 +7,11 @@ Content-Type: application/json
   "body_text": "Pukah"
 }
 ###
+
+POST http://localhost:9000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "sithiraac@gmail.com",
+  "password": "secret"
+}

@@ -7,6 +7,8 @@ import (
 	"RestApiBackend/internal/features/users"
 	"RestApiBackend/pkg/utils"
 	"context"
+	"fmt"
+	"github.com/pkg/errors"
 )
 
 type authenticationUseCase struct {
@@ -21,24 +23,34 @@ func NewAuthenticationUseCase(app infrastructure.Application, repository users.U
 	}
 }
 
-func (a authenticationUseCase) Login(ctx context.Context, request *dto.LoginRequest) (*utils.LoginResponse, error) {
+func (a authenticationUseCase) Login(ctx context.Context, request *dto.LoginRequest) (*utils.LoginResponse, *string, error) {
+
 	user, err := a.userRepository.FetchUserByEmail(ctx, request.Email)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, errors.Wrap(err, "authentication.Login.FetchUserByEmail")
+	}
+
+	matches := utils.CompareHashAndPassword(request.Password, *user.Password)
+
+	if !matches {
+		return nil, nil, errors.Wrap(nil, "authentication.Login.CompareHashAndPassword.Failed")
 	}
 
 	token, err := utils.GenerateLoginToken(&a.app, user)
+	fmt.Printf("Login token generated for user %s", token)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, errors.Wrap(err, "authentication.Login.GenerateLoginToken")
 	}
+
+	userId := user.ID.String()
 
 	return &utils.LoginResponse{
 		Type:         token.Type,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
-	}, nil
+	}, &userId, nil
 }
 
 func (a authenticationUseCase) Logout(ctx context.Context) error {
