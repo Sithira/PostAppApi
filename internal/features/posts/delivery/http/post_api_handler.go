@@ -19,8 +19,6 @@ func NewPostHandler(uc posts.UseCase) posts.Handler {
 
 func (p postUseCase) GetPostsForUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		userId := context.Query("userId")
-		context.Set("userId", userId)
 		fetchPosts, err := p.us.FetchPosts(context)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, nil)

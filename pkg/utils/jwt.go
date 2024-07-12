@@ -3,7 +3,11 @@ package utils
 import (
 	"RestApiBackend/infrastructure"
 	"RestApiBackend/internal/features/users/entities"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -54,4 +58,40 @@ func GenerateLoginToken(app *infrastructure.Application, user *entities.User) (*
 		AccessToken:  tokenString,
 		RefreshToken: refreshTokenString,
 	}, nil
+}
+
+func IsValidJwtAccessToken(app *infrastructure.Application, accessToken string) (bool, *string, error) {
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signin method %v", token.Header["alg"])
+		}
+		secret := []byte(app.Env.TokenSignerKey)
+		return secret, nil
+	})
+	if err != nil {
+		return false, nil, errors.Wrap(err, "jwt_convert_error")
+	}
+
+	if !token.Valid {
+		return false, nil, errors.Wrap(err, "jwt_convert_error")
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		subject := claims["subject"].(string)
+		return true, &subject, nil
+	}
+
+	return false, nil, nil
+}
+
+func GetUserIdFromContext(context *gin.Context) (*uuid.UUID, error) {
+	if context.MustGet("userId") != nil {
+		userIdFromContext := context.MustGet("userId").(*string)
+		userId, err := uuid.Parse(*userIdFromContext)
+		if err != nil {
+			return nil, err
+		}
+		return &userId, nil
+	}
+	return nil, errors.Wrap(nil, "No userId in context")
 }

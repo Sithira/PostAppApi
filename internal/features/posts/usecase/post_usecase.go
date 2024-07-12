@@ -5,7 +5,8 @@ import (
 	"RestApiBackend/internal/features/posts/dto"
 	"RestApiBackend/internal/features/posts/entites"
 	"RestApiBackend/pkg/http"
-	"context"
+	"RestApiBackend/pkg/utils"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -19,20 +20,19 @@ func NewPostUseCase(repository posts.PostRepository) posts.UseCase {
 	}
 }
 
-func (p postUseCase) FetchPosts(ctx context.Context) (*dto.PostsListResponse, error) {
-	var userIdFromCtx = ctx.Value("userId").(string)
-	userId, err := uuid.Parse(userIdFromCtx)
+func (p postUseCase) FetchPosts(ctx *gin.Context) (*dto.PostsListResponse, error) {
+	var userId, err = utils.GetUserIdFromContext(ctx)
 	if err != nil {
 
 	}
-	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, userId)
+	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, *userId)
 	if err != nil {
 		return nil, http.NewBadRequest(err)
 	}
 	return toPostResponseList(fetchedPosts), nil
 }
 
-func (p postUseCase) CreatePost(ctx context.Context, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
+func (p postUseCase) CreatePost(ctx *gin.Context, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
 	var userIdFromCtx = ctx.Value("userId").(string)
 	userId, err := uuid.Parse(userIdFromCtx)
 
@@ -62,7 +62,7 @@ func convertToCreatedPostResponse(post *entites.Post) *dto.CreatePostResponse {
 	return &dto.CreatePostResponse{ID: post.ID}
 }
 
-func (p postUseCase) UpdatePost(ctx context.Context, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
+func (p postUseCase) UpdatePost(ctx *gin.Context, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
 	return nil, nil
 }
 

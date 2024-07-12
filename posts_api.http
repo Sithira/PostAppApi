@@ -15,3 +15,9 @@ Content-Type: application/json
   "email": "sithiraac@gmail.com",
   "password": "secret"
 }
+###
+
+
+GET http://localhost:9000/api/v1/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjA4MTczODEsImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMDgxMzc4MSwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.zA8_xDAxNwSoTwfEkRpHV01YjfehL9MALTvsi1NH4nQ
