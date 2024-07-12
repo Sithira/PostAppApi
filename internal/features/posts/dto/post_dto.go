@@ -34,5 +34,5 @@ type PostsListResponse struct {
 	Page       int             `json:"page"`
 	Size       int             `json:"size"`
 	HasMore    bool            `json:"has_more"`
-	Posts      []*PostResponse `json:"posts"`
+	Data       []*PostResponse `json:"data"`
 }

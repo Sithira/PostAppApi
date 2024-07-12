@@ -76,7 +76,7 @@ func toPostResponseList(p []*entites.Post) *dto.PostsListResponse {
 		Page:       0,
 		Size:       0,
 		HasMore:    false,
-		Posts:      postList,
+		Data:       postList,
 	}
 }
 
