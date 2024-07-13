@@ -4,4 +4,5 @@ import "github.com/gin-gonic/gin"
 
 type AuthenticationHandler interface {
 	Login() gin.HandlerFunc
+	Register() gin.HandlerFunc
 }

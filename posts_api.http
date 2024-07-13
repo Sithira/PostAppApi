@@ -6,6 +6,7 @@ Content-Type: application/json
   "title": "Test title",
   "body_text": "Pukah"
 }
+
 ###
 
 POST http://localhost:9000/api/auth/login
@@ -15,9 +16,24 @@ Content-Type: application/json
   "email": "sithiraac@gmail.com",
   "password": "secret"
 }
+
 ###
 
 
 GET http://localhost:9000/api/v1/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjA4NDg0MTcsImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMDg0NDgxNywic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.UUEayOrSTa8rHeyXLGlq58lgv5RuomGrlJul2BT6PuA
+Authorization: Bearer
+
+###
+
+
+POST http://localhost:9000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testx@gmail.com",
+  "password": "abc@123",
+  "password_retyped": "abc@123",
+  "first_name": "testtt",
+  "last_name": "lastxxxx"
+}

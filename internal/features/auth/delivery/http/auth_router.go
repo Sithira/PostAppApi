@@ -7,4 +7,5 @@ import (
 
 func NewAuthRouter(authHandler auth.AuthenticationHandler, group *gin.RouterGroup) {
 	group.POST("/login", authHandler.Login())
+	group.POST("/register", authHandler.Register())
 }
