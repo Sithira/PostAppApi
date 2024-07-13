@@ -2,13 +2,14 @@ package posts
 
 import (
 	"RestApiBackend/internal/features/posts/dto"
-	"github.com/gin-gonic/gin"
+	"context"
+	"github.com/google/uuid"
 )
 
 type UseCase interface {
-	FetchPosts(ctx *gin.Context) (*dto.PostsListResponse, error)
+	FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.PostsListResponse, error)
 
-	CreatePost(ctx *gin.Context, comment *dto.CreatePostRequest) (*dto.CreatePostResponse, error)
+	CreatePost(ctx context.Context, userId uuid.UUID, comment *dto.CreatePostRequest) (*dto.CreatePostResponse, error)
 
-	UpdatePost(ctx *gin.Context, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error)
+	UpdatePost(ctx context.Context, userId uuid.UUID, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error)
 }

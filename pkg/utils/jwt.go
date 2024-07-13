@@ -8,6 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"net/http"
 	"time"
 )
 
@@ -84,14 +85,11 @@ func IsValidJwtAccessToken(app *infrastructure.Application, accessToken string) 
 	return false, nil, nil
 }
 
-func GetUserIdFromContext(context *gin.Context) (*uuid.UUID, error) {
-	if context.MustGet("userId") != nil {
-		userIdFromContext := context.MustGet("userId").(*string)
-		userId, err := uuid.Parse(*userIdFromContext)
-		if err != nil {
-			return nil, err
-		}
-		return &userId, nil
+func GetUserDetailsFromContext(context *gin.Context) (*uuid.UUID, *entities.User) {
+	if context.MustGet("user") != nil {
+		userIdFromContext := context.MustGet("user").(*entities.User)
+		return &userIdFromContext.ID, userIdFromContext
 	}
-	return nil, errors.Wrap(nil, "No userId in context")
+	context.AbortWithStatus(http.StatusForbidden)
+	return nil, nil
 }

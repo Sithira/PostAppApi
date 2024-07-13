@@ -3,6 +3,7 @@ package http
 import (
 	"RestApiBackend/internal/features/posts"
 	"RestApiBackend/internal/features/posts/dto"
+	"RestApiBackend/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,7 +20,8 @@ func NewPostHandler(uc posts.UseCase) posts.Handler {
 
 func (p postUseCase) GetPostsForUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		fetchPosts, err := p.us.FetchPosts(context)
+		_, user := utils.GetUserDetailsFromContext(context)
+		fetchPosts, err := p.us.FetchPosts(context, user.ID)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, nil)
 			return
@@ -31,15 +33,14 @@ func (p postUseCase) GetPostsForUser() gin.HandlerFunc {
 
 func (p postUseCase) CreatePostForUser() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		userId := context.Query("userId")
-		context.Set("userId", userId)
+		_, user := utils.GetUserDetailsFromContext(context)
 		var body *dto.CreatePostRequest
 		err := context.BindJSON(&body)
 		if err != nil {
 			context.JSON(400, "Unable to deser body")
 			return
 		}
-		post, err := p.us.CreatePost(context, body)
+		post, err := p.us.CreatePost(context, user.ID, body)
 		if err != nil {
 			context.JSON(400, err)
 			return

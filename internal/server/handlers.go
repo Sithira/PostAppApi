@@ -35,7 +35,7 @@ func (s *Server) MapHandlers() {
 	PingRoute(s.app, baseRouter)
 
 	// register routes
-	bearerToken := middlewares.BearerTokenMiddleware(s.app)
+	bearerToken := middlewares.NewAuthBearerToken(userRepository, s.app)
 
 	userRouter := baseRouter.Group("/api/v1/users")
 	userRouter.Use(bearerToken)

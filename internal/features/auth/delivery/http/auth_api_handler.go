@@ -23,7 +23,7 @@ func (auth authHandler) Login() gin.HandlerFunc {
 			context.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		login, userId, err := auth.uc.Login(context, &loginRequest)
+		login, userId, err := auth.uc.Login(context.Request.Context(), &loginRequest)
 		if err != nil {
 			context.AbortWithStatus(http.StatusForbidden)
 			return

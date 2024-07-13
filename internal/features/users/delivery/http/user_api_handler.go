@@ -2,6 +2,7 @@ package http
 
 import (
 	"RestApiBackend/internal/features/users"
+	"RestApiBackend/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,12 +19,8 @@ func NewUserHandler(userUc users.UseCase) users.Handlers {
 
 func (uc *userHandler) GetUserDetails() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		email := context.Query("email")
-		if len(email) <= 0 {
-			context.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
-			return
-		}
-		username, err := uc.userUseCase.GetUserByEmail(context, email)
+		_, userDetails := utils.GetUserDetailsFromContext(context)
+		username, err := uc.userUseCase.GetUserByEmail(context.Request.Context(), userDetails.Email)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return

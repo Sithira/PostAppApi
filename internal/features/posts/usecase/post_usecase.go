@@ -5,8 +5,7 @@ import (
 	"RestApiBackend/internal/features/posts/dto"
 	"RestApiBackend/internal/features/posts/entites"
 	"RestApiBackend/pkg/http"
-	"RestApiBackend/pkg/utils"
-	"github.com/gin-gonic/gin"
+	"context"
 	"github.com/google/uuid"
 )
 
@@ -20,26 +19,15 @@ func NewPostUseCase(repository posts.PostRepository) posts.UseCase {
 	}
 }
 
-func (p postUseCase) FetchPosts(ctx *gin.Context) (*dto.PostsListResponse, error) {
-	var userId, err = utils.GetUserIdFromContext(ctx)
-	if err != nil {
-
-	}
-	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, *userId)
+func (p postUseCase) FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.PostsListResponse, error) {
+	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, userId)
 	if err != nil {
 		return nil, http.NewBadRequest(err)
 	}
 	return toPostResponseList(fetchedPosts), nil
 }
 
-func (p postUseCase) CreatePost(ctx *gin.Context, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
-	var userIdFromCtx = ctx.Value("userId").(string)
-	userId, err := uuid.Parse(userIdFromCtx)
-
-	if err != nil {
-		return nil, http.NewBadRequest(err)
-	}
-
+func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
 	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, post.Title, userId)
 	if err != nil {
 		return nil, http.NewInternalServerError(err)
@@ -58,12 +46,13 @@ func (p postUseCase) CreatePost(ctx *gin.Context, post *dto.CreatePostRequest) (
 	return convertToCreatedPostResponse(createdPost), nil
 }
 
-func convertToCreatedPostResponse(post *entites.Post) *dto.CreatePostResponse {
-	return &dto.CreatePostResponse{ID: post.ID}
+func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
-func (p postUseCase) UpdatePost(ctx *gin.Context, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
-	return nil, nil
+func convertToCreatedPostResponse(post *entites.Post) *dto.CreatePostResponse {
+	return &dto.CreatePostResponse{ID: post.ID}
 }
 
 func toPostResponseList(p []*entites.Post) *dto.PostsListResponse {
