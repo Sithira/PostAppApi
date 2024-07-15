@@ -6,14 +6,15 @@ import (
 )
 
 type CreatePostRequest struct {
-	Title    *string `json:"title"`
-	BodyText *string `json:"body_text"`
-	Tags     string  `json:"tags"`
+	Title    *string `json:"title" validate:"required,min=5"`
+	BodyText *string `json:"body_text" validate:"required,min=10"`
+	Tags     *string `json:"tags"`
 }
 
 type UpdatePostRequest struct {
-	Title    string `json:"title"`
-	BodyText string `json:"body_text"`
+	Title    *string `json:"title" validator:"required" validator:"gt=5"`
+	BodyText *string `json:"body_text" validator:"required" validator:"gt=10"`
+	Tags     *string `json:"tags"`
 }
 
 type CreatePostResponse struct {

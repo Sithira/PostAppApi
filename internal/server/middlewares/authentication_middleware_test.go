@@ -50,12 +50,13 @@ func TestAuthMiddleware(t *testing.T) {
 
 	// Test cases
 	tests := []struct {
-		name           string
-		setupRequest   func(req *http.Request)
-		tokenValidator TokenValidatorFunction
-		expectedStatus int
-		expectedBody   string
-		mockSetup      func()
+		name             string
+		setupRequest     func(req *http.Request)
+		tokenValidator   TokenValidatorFunction
+		expectedStatus   int
+		expectedBody     string
+		hasExpectedCalls func() bool
+		mockSetup        func()
 	}{
 		{
 			name: "Missing Authorization Header",
@@ -92,6 +93,25 @@ func TestAuthMiddleware(t *testing.T) {
 			expectedStatus: http.StatusForbidden,
 			expectedBody:   "",
 			mockSetup:      func() {},
+		},
+		{
+			name: "Token validator fails",
+			setupRequest: func(req *http.Request) {
+				req.Header.Set("Authorization", "Bearer not_valid_token")
+			},
+			tokenValidator: func(app *infrastructure.Application, accessToken string) (bool, *string, error) {
+				return false, nil, errors.New("some bad error")
+			},
+			expectedStatus: http.StatusForbidden,
+			expectedBody:   "",
+			hasExpectedCalls: func() bool {
+				return false
+			},
+			mockSetup: func() {
+				mockUserRepo.ExpectedCalls = nil
+				user := &entities.User{}
+				mockUserRepo.On("FetchUserById", mock.Anything, "123").Return(user, errors.New("user not found"))
+			},
 		},
 		{
 			name: "Valid Token but User Fetch Fails",
@@ -172,7 +192,9 @@ func TestAuthMiddleware(t *testing.T) {
 			}
 
 			// Assert that the mock was called as expected
-			mockUserRepo.AssertExpectations(t)
+			if tt.hasExpectedCalls == nil || tt.hasExpectedCalls() {
+				mockUserRepo.AssertExpectations(t)
+			}
 		})
 	}
 }

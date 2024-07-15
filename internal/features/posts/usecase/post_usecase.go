@@ -6,8 +6,10 @@ import (
 	"RestApiBackend/internal/features/posts/entites"
 	"RestApiBackend/pkg/http"
 	"context"
+	"errors"
+	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"strings"
 )
 
 type postUseCase struct {
@@ -29,7 +31,14 @@ func (p postUseCase) FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.Pos
 }
 
 func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
-	if len(strings.TrimSpace(*post.Title)) == 0 && len(strings.TrimSpace(*post.BodyText)) == 0 {
+	validate := validator.New()
+
+	if err := validate.Struct(post); err != nil {
+		var errs validator.ValidationErrors
+		errors.As(err, &errs)
+		for _, fieldErr := range errs {
+			fmt.Printf("field %s: %s\n", fieldErr.Field(), fieldErr.Tag())
+		}
 		return nil, http.NewBadRequest("POST_ERR_001", "VALIDATION")
 	}
 
