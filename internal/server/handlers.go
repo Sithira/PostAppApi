@@ -11,6 +11,7 @@ import (
 	"RestApiBackend/internal/features/users/repository"
 	"RestApiBackend/internal/features/users/usecase"
 	"RestApiBackend/internal/server/middlewares"
+	"RestApiBackend/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,7 +36,7 @@ func (s *Server) MapHandlers() {
 	PingRoute(s.app, baseRouter)
 
 	// register routes
-	bearerToken := middlewares.NewAuthBearerToken(userRepository, s.app)
+	bearerToken := middlewares.NewAuthBearerToken(userRepository, s.app, utils.IsValidJwtAccessToken)
 
 	userRouter := baseRouter.Group("/api/v1/users")
 	userRouter.Use(bearerToken)

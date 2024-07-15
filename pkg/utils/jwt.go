@@ -61,6 +61,7 @@ func GenerateLoginToken(app *infrastructure.Application, user *entities.User) (*
 	}, nil
 }
 
+// IsValidJwtAccessToken return user-id
 func IsValidJwtAccessToken(app *infrastructure.Application, accessToken string) (bool, *string, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

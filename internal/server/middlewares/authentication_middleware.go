@@ -3,22 +3,24 @@ package middlewares
 import (
 	"RestApiBackend/infrastructure"
 	"RestApiBackend/internal/features/users"
-	"RestApiBackend/pkg/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 )
 
+type TokenValidatorFunction func(app *infrastructure.Application, accessToken string) (bool, *string, error)
+
 type authMiddleware struct {
-	ur  users.UserRepository
-	app *infrastructure.Application
+	userRepository users.UserRepository
+	tokenValidator TokenValidatorFunction
 }
 
-func NewAuthBearerToken(userRepo users.UserRepository, app *infrastructure.Application) gin.HandlerFunc {
-	return authMiddleware{ur: userRepo}.handle(app)
+func NewAuthBearerToken(userRepo users.UserRepository, app *infrastructure.Application, tokenValidator TokenValidatorFunction) gin.HandlerFunc {
+	return authMiddleware{userRepository: userRepo, tokenValidator: tokenValidator}.handle(app)
 }
 
-func (am authMiddleware) handle(app *infrastructure.Application) gin.HandlerFunc {
+func (m authMiddleware) handle(app *infrastructure.Application) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		authHeader := context.GetHeader("Authorization")
 		if authHeader == "" {
@@ -34,22 +36,22 @@ func (am authMiddleware) handle(app *infrastructure.Application) gin.HandlerFunc
 		}
 
 		tokenString := parts[1]
-		token, s, err := utils.IsValidJwtAccessToken(app, tokenString)
+		token, s, err := m.tokenValidator(app, tokenString)
 		if err != nil {
 			context.AbortWithStatus(http.StatusForbidden)
 			return
 		}
 		if !token {
-			context.Status(http.StatusBadRequest)
-			context.Abort()
+			fmt.Printf("Invalid token %v", token)
+			context.AbortWithStatus(http.StatusForbidden)
 			return
 		}
-		user, err := am.ur.FetchUserById(context.Request.Context(), *s)
+		user, err := m.userRepository.FetchUserById(context.Request.Context(), *s)
 		if err != nil {
 			context.AbortWithStatus(http.StatusForbidden)
 			return
 		}
-		context.Set("user", user)
+		context.Set("user", &user)
 		context.Next()
 	}
 

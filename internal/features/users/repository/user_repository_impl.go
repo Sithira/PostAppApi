@@ -56,7 +56,7 @@ func (r *userRepository) FetchUserByEmail(ctx context.Context, email string) (*e
 
 func (r *userRepository) CreateNewUser(ctx context.Context, email string, firstName string, lastName string, password string) (*entities.User, error) {
 	user := entities.User{}
-	statements, err := r.db.PrepareContext(ctx, users.INSERT_USER_QUERY)
+	statements, err := r.db.PrepareContext(ctx, users.InsertUserQuery)
 
 	if err != nil {
 
