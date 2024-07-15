@@ -6,9 +6,9 @@ import (
 )
 
 type CreatePostRequest struct {
-	Title    string `json:"title"`
-	BodyText string `json:"body_text"`
-	Tags     string `json:"tags"`
+	Title    *string `json:"title"`
+	BodyText *string `json:"body_text"`
+	Tags     string  `json:"tags"`
 }
 
 type UpdatePostRequest struct {

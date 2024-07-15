@@ -6,7 +6,6 @@ import (
 	"RestApiBackend/internal/features/users/entities"
 	"RestApiBackend/pkg/http"
 	"context"
-	"github.com/pkg/errors"
 )
 
 type clientUseCase struct {
@@ -22,7 +21,7 @@ func NewUserUserCase(repository users.UserRepository) users.UseCase {
 func (uc clientUseCase) GetUserByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
 	user, err := uc.userRepository.FetchUserByEmail(ctx, email)
 	if err != nil {
-		return nil, http.NewBadRequest(errors.Wrap(err, ""))
+		return nil, http.NewBadRequest("AUTH_000", err)
 	}
 	return toUserResponse(user), nil
 }

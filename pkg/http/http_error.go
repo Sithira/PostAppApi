@@ -25,7 +25,15 @@ func (e RestError) Error() string {
 	return fmt.Sprintf("status: %d - errors: %s - causes: %v", e.ErrorCode, e.ErrorDescription, e.ErrCauses)
 }
 
-func NewBadRequest(causes interface{}) RestError {
+func NewBadRequest(code string, causes interface{}) RestError {
+	message, ok := causes.(string)
+	if ok {
+		return RestError{
+			Code:             http.StatusBadRequest,
+			ErrorCode:        errors.New(code).Error(),
+			ErrorDescription: message,
+		}
+	}
 	return RestError{
 		ErrorCode:        errors.New(causes.(string)).Error(),
 		ErrorDescription: "",
@@ -36,6 +44,6 @@ func NewInternalServerError(causes interface{}) RestError {
 	return RestError{
 		Code:             http.StatusBadRequest,
 		ErrorCode:        errors.New("Internal Server Error").Error(),
-		ErrorDescription: "",
+		ErrorDescription: causes.(string),
 	}
 }

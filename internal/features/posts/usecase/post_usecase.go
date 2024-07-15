@@ -7,6 +7,7 @@ import (
 	"RestApiBackend/pkg/http"
 	"context"
 	"github.com/google/uuid"
+	"strings"
 )
 
 type postUseCase struct {
@@ -22,25 +23,30 @@ func NewPostUseCase(repository posts.PostRepository) posts.UseCase {
 func (p postUseCase) FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.PostsListResponse, error) {
 	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, userId)
 	if err != nil {
-		return nil, http.NewBadRequest(err)
+		return nil, http.NewBadRequest("ERR_000", err)
 	}
 	return toPostResponseList(fetchedPosts), nil
 }
 
 func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
-	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, post.Title, userId)
+	if len(strings.TrimSpace(*post.Title)) == 0 && len(strings.TrimSpace(*post.BodyText)) == 0 {
+		return nil, http.NewBadRequest("POST_ERR_001", "VALIDATION")
+	}
+
+	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, *post.Title, userId)
+
 	if err != nil {
 		return nil, http.NewInternalServerError(err)
 	}
 
 	if *duplicateExists {
-		return nil, http.NewBadRequest("Duplicate post exists")
+		return nil, http.NewBadRequest("ERR_001", "")
 	}
 
 	createdPost, err := p.postRepository.CreatePostForUser(ctx, userId, post)
 
 	if err != nil {
-		return nil, http.NewBadRequest(err)
+		return nil, http.NewBadRequest("ERR_000", err)
 	}
 
 	return convertToCreatedPostResponse(createdPost), nil
