@@ -51,7 +51,7 @@ func (m authMiddleware) handle(app *infrastructure.Application) gin.HandlerFunc 
 			context.AbortWithStatus(http.StatusForbidden)
 			return
 		}
-		context.Set("user", &user)
+		context.Set("user", user)
 		context.Next()
 	}
 
