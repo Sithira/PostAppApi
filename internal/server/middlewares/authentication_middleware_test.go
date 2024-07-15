@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -104,6 +105,7 @@ func TestAuthMiddleware(t *testing.T) {
 			expectedStatus: http.StatusForbidden,
 			expectedBody:   "",
 			mockSetup: func() {
+				mockUserRepo.ExpectedCalls = nil
 				user := &entities.User{}
 				mockUserRepo.On("FetchUserById", mock.Anything, "123").Return(user, errors.New("user not found"))
 			},
@@ -120,6 +122,7 @@ func TestAuthMiddleware(t *testing.T) {
 			expectedStatus: http.StatusOK,
 			expectedBody:   "",
 			mockSetup: func() {
+				mockUserRepo.ExpectedCalls = nil
 				expectedUser := &entities.User{ID: uuid.New(), FirstName: "John", LastName: "Doe"}
 				mockUserRepo.On("FetchUserById", mock.Anything, "123").Return(expectedUser, nil)
 			},
@@ -128,6 +131,7 @@ func TestAuthMiddleware(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			log.Printf("Running test %s", tt.name)
 			// Setup the middleware
 			middleware := NewAuthBearerToken(mockUserRepo, app, tt.tokenValidator)
 
