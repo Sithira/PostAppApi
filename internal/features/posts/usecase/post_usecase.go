@@ -5,11 +5,12 @@ import (
 	"RestApiBackend/internal/features/posts/dto"
 	"RestApiBackend/internal/features/posts/entites"
 	"RestApiBackend/pkg/http"
+	"RestApiBackend/pkg/utils"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"net/http"
 )
 
 type postUseCase struct {
@@ -25,37 +26,42 @@ func NewPostUseCase(repository posts.PostRepository) posts.UseCase {
 func (p postUseCase) FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.PostsListResponse, error) {
 	fetchedPosts, err := p.postRepository.FetchPostsOfUser(ctx, userId)
 	if err != nil {
-		return nil, http.NewBadRequest("ERR_000", err)
+		return nil, http_error.InternalServerError
 	}
 	return toPostResponseList(fetchedPosts), nil
 }
 
-func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post *dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
+func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
 	validate := validator.New()
 
 	if err := validate.Struct(post); err != nil {
 		var errs validator.ValidationErrors
 		errors.As(err, &errs)
+		errorList := make(map[string]string)
 		for _, fieldErr := range errs {
-			fmt.Printf("field %s: %s\n", fieldErr.Field(), fieldErr.Tag())
+			errorList[fieldErr.Field()] = fieldErr.Tag()
 		}
-		return nil, http.NewBadRequest("POST_ERR_001", "VALIDATION")
+		return nil, http_error.NewRestError(http.StatusBadRequest, "ERR_000", errorList)
 	}
 
-	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, *post.Title, userId)
+	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, utils.ToString(post.Title), userId)
 
 	if err != nil {
-		return nil, http.NewInternalServerError(err)
+		return nil, http_error.NewInternalServerError(err)
 	}
 
 	if *duplicateExists {
-		return nil, http.NewBadRequest("ERR_001", "")
+		return nil, http_error.NewRestError(http.StatusBadRequest, "ERR_001", "Duplicate")
 	}
 
-	createdPost, err := p.postRepository.CreatePostForUser(ctx, userId, post)
+	postEntity := entites.NewPost()
+	postEntity.Title = utils.ToString(post.Title)
+	postEntity.Body = utils.ToString(post.BodyText)
+
+	createdPost, err := p.postRepository.CreatePostForUser(ctx, userId, *postEntity)
 
 	if err != nil {
-		return nil, http.NewBadRequest("ERR_000", err)
+		return nil, http_error.NewRestError(http.StatusInternalServerError, "", "")
 	}
 
 	return convertToCreatedPostResponse(createdPost), nil

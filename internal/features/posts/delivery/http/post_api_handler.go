@@ -3,6 +3,7 @@ package http
 import (
 	"RestApiBackend/internal/features/posts"
 	"RestApiBackend/internal/features/posts/dto"
+	httperror "RestApiBackend/pkg/http"
 	"RestApiBackend/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -37,10 +38,10 @@ func (p postUseCase) CreatePostForUser() gin.HandlerFunc {
 		var body *dto.CreatePostRequest
 		err := context.BindJSON(&body)
 		if err != nil {
-			context.JSON(400, "Unable to deser body")
+			context.JSON(httperror.ErrorResponse(err))
 			return
 		}
-		post, err := p.us.CreatePost(context, user.ID, body)
+		post, err := p.us.CreatePost(context, user.ID, *body)
 		if err != nil {
 			context.JSON(400, err)
 			return

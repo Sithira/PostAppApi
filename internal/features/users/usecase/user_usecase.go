@@ -4,8 +4,9 @@ import (
 	"RestApiBackend/internal/features/users"
 	"RestApiBackend/internal/features/users/dto"
 	"RestApiBackend/internal/features/users/entities"
-	"RestApiBackend/pkg/http"
+	httperror "RestApiBackend/pkg/http"
 	"context"
+	"net/http"
 )
 
 type clientUseCase struct {
@@ -21,7 +22,7 @@ func NewUserUserCase(repository users.UserRepository) users.UseCase {
 func (uc clientUseCase) GetUserByEmail(ctx context.Context, email string) (*dto.UserResponse, error) {
 	user, err := uc.userRepository.FetchUserByEmail(ctx, email)
 	if err != nil {
-		return nil, http.NewBadRequest("AUTH_000", err)
+		return nil, httperror.NewRestError(http.StatusForbidden, "ERR_AUTH_000", err)
 	}
 	return toUserResponse(user), nil
 }

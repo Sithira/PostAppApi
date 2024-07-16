@@ -15,6 +15,10 @@ type Post struct {
 	DeletedAt time.Time `db:"updated_at"`
 }
 
+func NewPost() *Post {
+	return &Post{ID: uuid.New()}
+}
+
 type UserPosts struct {
 	PostId uuid.UUID `db:"post_id"`
 	UserId uuid.UUID `db:"user_id"`

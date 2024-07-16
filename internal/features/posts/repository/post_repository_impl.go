@@ -2,7 +2,6 @@ package repository
 
 import (
 	"RestApiBackend/internal/features/posts"
-	"RestApiBackend/internal/features/posts/dto"
 	"RestApiBackend/internal/features/posts/entites"
 	"context"
 	"database/sql"
@@ -52,7 +51,7 @@ func (p postRepository) FetchPostsOfUser(ctx context.Context, userId uuid.UUID) 
 	return fetchedPosts, nil
 }
 
-func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID, request *dto.CreatePostRequest) (*entites.Post, error) {
+func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID, request entites.Post) (*entites.Post, error) {
 	statement, err := p.db.PrepareContext(ctx, posts.InsertPostByUserId)
 
 	if err != nil {
@@ -63,7 +62,7 @@ func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID,
 
 	pst := &entites.Post{}
 
-	if err := statement.QueryRowContext(ctx, uuid.New(), userId, &request.Title, &request.BodyText).Scan(
+	if err := statement.QueryRowContext(ctx, uuid.New(), userId, request.Title, request.Body).Scan(
 		&pst.ID,
 	); err != nil {
 		return nil, errors.Wrap(err, "post_repo.CreatePostForUser.insert.Scan")

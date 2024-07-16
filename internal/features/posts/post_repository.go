@@ -1,7 +1,6 @@
 package posts
 
 import (
-	"RestApiBackend/internal/features/posts/dto"
 	"RestApiBackend/internal/features/posts/entites"
 	"context"
 	"github.com/google/uuid"
@@ -14,7 +13,7 @@ const (
 )
 
 type PostRepository interface {
-	CreatePostForUser(ctx context.Context, userId uuid.UUID, request *dto.CreatePostRequest) (*entites.Post, error)
+	CreatePostForUser(ctx context.Context, userId uuid.UUID, request entites.Post) (*entites.Post, error)
 
 	FindDuplicatedByPostTitle(ctx context.Context, postTitle string, userId uuid.UUID) (*bool, error)
 
