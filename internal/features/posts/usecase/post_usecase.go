@@ -74,29 +74,49 @@ func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post dto.
 	return convertToCreatedPostResponse(createdPost), nil
 }
 
-func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, postBody dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
+func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, postBody dto.UpdatePostRequest) error {
 
 	post, err := p.postRepository.FetchPost(ctx, userId, postId)
 
 	if err != nil {
-		return nil, http_error.ParseErrors(err)
+		return http_error.ParseErrors(err)
 	}
 
 	if post.UserId != userId {
-		return nil, http_error.NewRestError(http.StatusForbidden, "ownership.failure", "")
+		return http_error.NewRestError(http.StatusForbidden, "ownership.failure", "")
 	}
 
 	post.Title = utils.ToString(postBody.Title)
 	post.Body = utils.ToString(postBody.BodyText)
 	post.UpdatedAt = time.Now()
 
-	updatedPost, err := p.postRepository.UpdatePostOfUser(ctx, *post)
+	err = p.postRepository.UpdatePostOfUser(ctx, *post)
 
 	if err != nil {
-		return nil, http_error.ParseErrors(err)
+		return http_error.ParseErrors(err)
 	}
 
-	return convertToCreatedPostResponse(updatedPost), nil
+	return nil
+}
+
+func (p postUseCase) DeletePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error {
+	post, err := p.postRepository.FetchPost(ctx, userId, postId)
+
+	if err != nil {
+		return http_error.ParseErrors(err)
+	}
+
+	if post.UserId != userId {
+		return http_error.NewRestError(http.StatusForbidden, "ownership.failure", "")
+	}
+
+	err = p.postRepository.DeletePostOfUser(ctx, *post)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func convertToCreatedPostResponse(post *entites.Post) *dto.CreatePostResponse {

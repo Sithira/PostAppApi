@@ -90,19 +90,32 @@ func (p postUseCase) UpdatePostForUser() gin.HandlerFunc {
 			context.JSON(httperror.ErrorResponse(err))
 			return
 		}
-		post, err := p.us.UpdatePost(context, user.ID, postId, *postRequest)
+		err = p.us.UpdatePost(context, user.ID, postId, *postRequest)
 		if err != nil {
 			context.JSON(httperror.ErrorResponse(err))
 			return
 		}
-		context.JSON(http.StatusOK, post)
+		context.Status(http.StatusAccepted)
 		return
 	}
 }
 
 func (p postUseCase) DeletePostForUser() gin.HandlerFunc {
-	//TODO implement me
-	panic("implement me")
+	return func(context *gin.Context) {
+		postId, err := uuid.Parse(context.Param("postId"))
+		if err != nil {
+			context.JSON(httperror.ErrorResponse(err))
+			return
+		}
+		_, user := utils.GetUserDetailsFromContext(context)
+		err = p.us.DeletePost(context, user.ID, postId)
+		if err != nil {
+			context.JSON(httperror.ErrorResponse(err))
+			return
+		}
+		context.Status(http.StatusNoContent)
+		return
+	}
 }
 
 func (p postUseCase) AttachPostToUser() gin.HandlerFunc {

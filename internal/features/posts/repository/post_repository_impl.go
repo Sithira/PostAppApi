@@ -73,9 +73,16 @@ func (p postRepository) FetchPostsOfUser(ctx context.Context, userId uuid.UUID) 
 }
 
 func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID, request entites.Post) (*entites.Post, error) {
-	statement, err := p.db.PrepareContext(ctx, posts.InsertPostByUserId)
+	tx, err := p.db.BeginTx(ctx, nil)
 
 	if err != nil {
+		return nil, err
+	}
+
+	statement, err := tx.PrepareContext(ctx, posts.InsertPostByUserId)
+
+	if err != nil {
+		_ = tx.Rollback()
 		return nil, errors.Wrap(err, "post_repo.CreatePostForUser.prepare")
 	}
 
@@ -86,14 +93,77 @@ func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID,
 	if err := statement.QueryRowContext(ctx, uuid.New(), userId, request.Title, request.Body).Scan(
 		&pst.ID,
 	); err != nil {
+		_ = tx.Rollback()
 		return nil, errors.Wrap(err, "post_repo.CreatePostForUser.insert.Scan")
 	}
 
+	_ = tx.Commit()
 	return pst, nil
 }
 
-func (p postRepository) UpdatePostOfUser(ctx context.Context, request entites.Post) (*entites.Post, error) {
-	return nil, nil
+func (p postRepository) UpdatePostOfUser(ctx context.Context, request entites.Post) error {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	result, err := tx.ExecContext(ctx, posts.UpdatePostOfUser, request.ID.String(), request.UserId.String(), request.Title, request.Body)
+	if err != nil {
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
+		return errors.Wrap(err, "post_repo.UpdatePostOfUser.update.Exec")
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
+		return errors.Wrap(err, "post_repo.UpdatePostOfUser.update.Exec.RowsAffected")
+	}
+	if affected > 0 {
+		err := tx.Commit()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	err = tx.Rollback()
+	if err != nil {
+		return err
+	}
+	return errors.New("update not performed")
+}
+
+func (p postRepository) DeletePostOfUser(ctx context.Context, request entites.Post) error {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		err := tx.Commit()
+		if err != nil {
+			return err
+		}
+		return err
+	}
+
+	result, err := tx.ExecContext(ctx, posts.DeletePostOfUser, request.ID.String(), request.UserId.String())
+	affected, err := result.RowsAffected()
+
+	if affected > 0 {
+		err := tx.Commit()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = tx.Rollback()
+
+	if err != nil {
+		return err
+	}
+
+	return errors.New("delete not performed")
 }
 
 func (p postRepository) FindDuplicatedByPostTitle(ctx context.Context, postTitle string, userId uuid.UUID) (*bool, error) {

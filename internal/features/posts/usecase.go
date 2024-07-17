@@ -13,5 +13,7 @@ type UseCase interface {
 
 	CreatePost(ctx context.Context, userId uuid.UUID, postRequest dto.CreatePostRequest) (*dto.CreatePostResponse, error)
 
-	UpdatePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, postRequest dto.UpdatePostRequest) (*dto.CreatePostResponse, error)
+	UpdatePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, postRequest dto.UpdatePostRequest) error
+
+	DeletePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error
 }
