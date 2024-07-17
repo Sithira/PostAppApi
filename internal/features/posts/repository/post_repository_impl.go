@@ -3,6 +3,7 @@ package repository
 import (
 	"RestApiBackend/internal/features/posts"
 	"RestApiBackend/internal/features/posts/entites"
+	httperror "RestApiBackend/pkg/http"
 	"context"
 	"database/sql"
 	"github.com/google/uuid"
@@ -17,6 +18,26 @@ func NewPostsRepository(db *sql.DB) posts.PostRepository {
 	return &postRepository{
 		db: db,
 	}
+}
+
+func (p postRepository) FetchPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) (*entites.Post, error) {
+	statement, err := p.db.PrepareContext(ctx, posts.SelectPostById)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "query prepare failure")
+	}
+
+	defer statement.Close()
+
+	post := &entites.Post{}
+
+	if err := statement.QueryRowContext(ctx, postId.String(), userId.String()).Scan(&post.ID, &post.UserId, &post.Title, &post.Body, &post.CreatedAt, &post.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.Wrap(err, "no results")
+		}
+		return nil, httperror.NewInternalServerError(nil)
+	}
+	return post, nil
 }
 
 func (p postRepository) FetchPostsOfUser(ctx context.Context, userId uuid.UUID) ([]*entites.Post, error) {
@@ -69,6 +90,10 @@ func (p postRepository) CreatePostForUser(ctx context.Context, userId uuid.UUID,
 	}
 
 	return pst, nil
+}
+
+func (p postRepository) UpdatePostOfUser(ctx context.Context, request entites.Post) (*entites.Post, error) {
+	return nil, nil
 }
 
 func (p postRepository) FindDuplicatedByPostTitle(ctx context.Context, postTitle string, userId uuid.UUID) (*bool, error) {

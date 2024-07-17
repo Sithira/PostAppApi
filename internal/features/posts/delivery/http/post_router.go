@@ -8,4 +8,6 @@ import (
 func NewPostRouter(h posts.Handler, group *gin.RouterGroup) {
 	group.GET("", h.GetPostsForUser())
 	group.POST("", h.CreatePostForUser())
+	group.GET(":postId", h.GetPostById())
+	group.PUT(":postId", h.UpdatePostForUser())
 }

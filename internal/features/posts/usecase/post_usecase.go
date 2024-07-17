@@ -7,10 +7,9 @@ import (
 	"RestApiBackend/pkg/http"
 	"RestApiBackend/pkg/utils"
 	"context"
-	"errors"
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"net/http"
+	"time"
 )
 
 type postUseCase struct {
@@ -31,17 +30,25 @@ func (p postUseCase) FetchPosts(ctx context.Context, userId uuid.UUID) (*dto.Pos
 	return toPostResponseList(fetchedPosts), nil
 }
 
-func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
-	validate := validator.New()
+func (p postUseCase) FetchPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) (*dto.PostResponse, error) {
+	post, err := p.postRepository.FetchPost(ctx, userId, postId)
+	if err != nil {
+		return nil, http_error.ParseErrors(err)
+	}
+	return &dto.PostResponse{
+		ID:        post.ID,
+		Title:     post.Title,
+		BodyText:  post.Body,
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+	}, nil
+}
 
-	if err := validate.Struct(post); err != nil {
-		var errs validator.ValidationErrors
-		errors.As(err, &errs)
-		errorList := make(map[string]string)
-		for _, fieldErr := range errs {
-			errorList[fieldErr.Field()] = fieldErr.Tag()
-		}
-		return nil, http_error.NewRestError(http.StatusBadRequest, "ERR_000", errorList)
+func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post dto.CreatePostRequest) (*dto.CreatePostResponse, error) {
+	_, err := utils.ValidateStruct(post)
+
+	if err != nil {
+		return nil, err
 	}
 
 	duplicateExists, err := p.postRepository.FindDuplicatedByPostTitle(ctx, utils.ToString(post.Title), userId)
@@ -67,9 +74,29 @@ func (p postUseCase) CreatePost(ctx context.Context, userId uuid.UUID, post dto.
 	return convertToCreatedPostResponse(createdPost), nil
 }
 
-func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId string, comment *dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, postBody dto.UpdatePostRequest) (*dto.CreatePostResponse, error) {
+
+	post, err := p.postRepository.FetchPost(ctx, userId, postId)
+
+	if err != nil {
+		return nil, http_error.ParseErrors(err)
+	}
+
+	if post.UserId != userId {
+		return nil, http_error.NewRestError(http.StatusForbidden, "ownership.failure", "")
+	}
+
+	post.Title = utils.ToString(postBody.Title)
+	post.Body = utils.ToString(postBody.BodyText)
+	post.UpdatedAt = time.Now()
+
+	updatedPost, err := p.postRepository.UpdatePostOfUser(ctx, *post)
+
+	if err != nil {
+		return nil, http_error.ParseErrors(err)
+	}
+
+	return convertToCreatedPostResponse(updatedPost), nil
 }
 
 func convertToCreatedPostResponse(post *entites.Post) *dto.CreatePostResponse {

@@ -20,7 +20,7 @@ func NewAuthenticationHandler(useCase auth.AuthenticationUseCase) auth.Authentic
 func (auth authHandler) Register() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var registerRequest *dto.RegisterRequest
-		err := context.BindJSON(&registerRequest)
+		err := context.ShouldBindJSON(&registerRequest)
 		fmt.Printf("Register request body = %v %T", registerRequest, registerRequest)
 
 		if err != nil {
@@ -42,7 +42,7 @@ func (auth authHandler) Register() gin.HandlerFunc {
 func (auth authHandler) Login() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var loginRequest dto.LoginRequest
-		err := context.BindJSON(&loginRequest)
+		err := context.ShouldBindJSON(&loginRequest)
 		if err != nil {
 			context.AbortWithStatus(http.StatusBadRequest)
 			return

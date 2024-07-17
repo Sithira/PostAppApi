@@ -23,6 +23,7 @@ const (
 
 var (
 	BadRequest            = errors.New("Bad request")
+	JsonFormatFailed      = errors.New("Request Format Failed")
 	WrongCredentials      = errors.New("Wrong Credentials")
 	NotFound              = errors.New("Not Found")
 	Unauthorized          = errors.New("Unauthorized")
