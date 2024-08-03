@@ -79,11 +79,11 @@ func (suite *PostUseCaseTestSuite) TestFetchAndUpdatePost() {
 	title := "Sample Title UpdTED"
 
 	t.Run("Fetch User's Posts", func(t *testing.T) {
-		posts, err := suite.postUseCase.FetchPosts(suite.ctx, suite.userId)
+		fetchPosts, err := suite.postUseCase.FetchPosts(suite.ctx, suite.userId)
 		if err != nil {
 			log.Fatal(err)
 		}
-		firstPost = posts.Data[0] // Correctly assign the pointer here
+		firstPost = fetchPosts.Data[0] // Correctly assign the pointer here
 		assert.NotNil(t, firstPost)
 	})
 
