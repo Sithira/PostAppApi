@@ -41,7 +41,7 @@ func (suite *PostUseCaseTestSuite) SetupSuite() {
 	suite.userId = uuid.New()
 }
 
-func (suite *PostUseCaseTestSuite) TestCreatePost() {
+func (suite *PostUseCaseTestSuite) TestACreatePost0() {
 
 	t := suite.T()
 	title := "Sample Title"
@@ -62,18 +62,18 @@ func (suite *PostUseCaseTestSuite) TestCreatePost() {
 	assert.NotNil(t, post)
 }
 
-func (suite *PostUseCaseTestSuite) TestFetchUserPosts() {
+func (suite *PostUseCaseTestSuite) TestBFetchUserPosts1() {
 	t := suite.T()
 
 	p, err := suite.postUseCase.FetchPosts(suite.ctx, suite.userId)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	assert.NotNil(t, p.Data)
 	assert.Equal(t, 1, len(p.Data))
 }
 
-func (suite *PostUseCaseTestSuite) TestFetchAndUpdatePost() {
+func (suite *PostUseCaseTestSuite) TestCFetchAndUpdatePostAndDelete() {
 	t := suite.T()
 	var firstPost *dto.PostResponse
 	title := "Sample Title UpdTED"
@@ -107,6 +107,22 @@ func (suite *PostUseCaseTestSuite) TestFetchAndUpdatePost() {
 
 		assert.NotNil(t, post)
 		assert.Equal(t, title, post.Title)
+	})
+
+	t.Run("Delete updated post", func(t *testing.T) {
+		err := suite.postUseCase.DeletePost(suite.ctx, suite.userId, firstPost.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Nil(t, err)
+
+		p, err := suite.postUseCase.FetchPosts(suite.ctx, suite.userId)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, 0, len(p.Data))
 	})
 }
 
