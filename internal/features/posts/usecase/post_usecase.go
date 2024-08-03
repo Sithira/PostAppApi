@@ -86,6 +86,14 @@ func (p postUseCase) UpdatePost(ctx context.Context, userId uuid.UUID, postId uu
 		return http_error.NewRestError(http.StatusForbidden, "ownership.failure", "")
 	}
 
+	if postBody.Title == nil || len(*postBody.Title) < 5 {
+		return http_error.NewRestError(http.StatusBadRequest, "validation.failure.title", "")
+	}
+
+	if postBody.BodyText == nil || len(*postBody.BodyText) < 10 {
+		return http_error.NewRestError(http.StatusBadRequest, "validation.failure.body", "")
+	}
+
 	post.Title = utils.ToString(postBody.Title)
 	post.Body = utils.ToString(postBody.BodyText)
 	post.UpdatedAt = time.Now()

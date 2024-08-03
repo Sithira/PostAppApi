@@ -25,6 +25,8 @@ services:
       DB_NAME: postgres
     volumes:
       - .:/app
+    ports:
+      - 8080:9000
 
 volumes:
   postgres_data:

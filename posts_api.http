@@ -22,7 +22,7 @@ Content-Type: application/json
 
 GET http://localhost:9000/api/v1/posts
 Content-Type: application/json
-Authorization: Bearer
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjExOTQzNjksImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMTE5MDc2OSwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.HPY0J7U7ftpxbGnpA8APFq5rsfCFcHiaRytvti64E3o
 
 ###
 
@@ -37,3 +37,38 @@ Content-Type: application/json
   "first_name": "testtt",
   "last_name": "lastxxxx"
 }
+
+###
+
+POST http://localhost:9000/api/v1/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjExOTQzNjksImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMTE5MDc2OSwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.HPY0J7U7ftpxbGnpA8APFq5rsfCFcHiaRytvti64E3o
+
+{
+  "title": "Lapdsadsdsa",
+  "body_text": "Topadsdsadasdsa"
+}
+
+###
+
+
+PUT http://localhost:9000/api/v1/posts/fd597181-dc4b-422e-804a-2a0657224813
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjEyMzA3NzAsImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMTIyNzE3MCwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.gMYr_VTKypdrlBBlSamHsqk1mzf5rhbv9pYO54__m4M
+
+{
+  "title": "hahahaha",
+  "body_text": "Topadsdsadasdsa"
+}
+
+###
+
+DELETE http://localhost:9000/api/v1/posts/fd597181-dc4b-422e-804a-2a0657224813
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjEyMzA3NzAsImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMTIyNzE3MCwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.gMYr_VTKypdrlBBlSamHsqk1mzf5rhbv9pYO54__m4M
+
+###
+
+GET http://localhost:9000/api/v1/posts/fd597181-dc4b-422e-804a-2a0657224813
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpdGhpcmFhY0BnbWFpbC5jb20iLCJleHAiOjE3MjEyMzA3NzAsImZ1bGxfbmFtZSI6IlNpdGhpcmEgTXVuYXNpbmdoZSIsImlhdCI6MTcyMTIyNzE3MCwic3ViamVjdCI6ImU4YTYxZjA1LTFmODItNGRmZC1iMzZkLTE0NWM0NWYyYmRlOCJ9.gMYr_VTKypdrlBBlSamHsqk1mzf5rhbv9pYO54__m4M
