@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-type PostUseCaseTestSuite struct {
+type PostUseCaseIntegrationTestSuite struct {
 	suite.Suite
 	pgContainer *testhelpers.PostgresContainer
 	postUseCase posts.UseCase
@@ -24,10 +24,10 @@ type PostUseCaseTestSuite struct {
 }
 
 func TestNewPostUseCase(t *testing.T) {
-	suite.Run(t, new(PostUseCaseTestSuite))
+	suite.Run(t, new(PostUseCaseIntegrationTestSuite))
 }
 
-func (suite *PostUseCaseTestSuite) SetupSuite() {
+func (suite *PostUseCaseIntegrationTestSuite) SetupSuite() {
 	suite.ctx = context.Background()
 	connection, err := testhelpers.CreatePostgresContainer(suite.ctx)
 	if err != nil {
@@ -41,7 +41,7 @@ func (suite *PostUseCaseTestSuite) SetupSuite() {
 	suite.userId = uuid.New()
 }
 
-func (suite *PostUseCaseTestSuite) TestACreatePost0() {
+func (suite *PostUseCaseIntegrationTestSuite) TestACreatePost0() {
 
 	t := suite.T()
 	title := "Sample Title"
@@ -62,7 +62,7 @@ func (suite *PostUseCaseTestSuite) TestACreatePost0() {
 	assert.NotNil(t, post)
 }
 
-func (suite *PostUseCaseTestSuite) TestBFetchUserPosts1() {
+func (suite *PostUseCaseIntegrationTestSuite) TestBFetchUserPosts1() {
 	t := suite.T()
 
 	p, err := suite.postUseCase.FetchPosts(suite.ctx, suite.userId)
@@ -73,7 +73,7 @@ func (suite *PostUseCaseTestSuite) TestBFetchUserPosts1() {
 	assert.Equal(t, 1, len(p.Data))
 }
 
-func (suite *PostUseCaseTestSuite) TestCFetchAndUpdatePostAndDelete() {
+func (suite *PostUseCaseIntegrationTestSuite) TestCFetchAndUpdatePostAndDelete() {
 	t := suite.T()
 	var firstPost *dto.PostResponse
 	title := "Sample Title UpdTED"
@@ -126,7 +126,7 @@ func (suite *PostUseCaseTestSuite) TestCFetchAndUpdatePostAndDelete() {
 	})
 }
 
-func (suite *PostUseCaseTestSuite) TearDownSuite() {
+func (suite *PostUseCaseIntegrationTestSuite) TearDownSuite() {
 	log.Println("Tearing down")
 	if err := suite.pgContainer.Terminate(suite.ctx); err != nil {
 		log.Fatalf("error terminating postgres container: %s", err)
