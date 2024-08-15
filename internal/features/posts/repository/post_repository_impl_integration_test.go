@@ -49,10 +49,10 @@ func (suite *PostRepositoryIntegrationTestSuite) TearDownSuite() {
 	}
 }
 
-func (suite *PostRepositoryIntegrationTestSuite) TestFetchPost() {
+func (suite *PostRepositoryIntegrationTestSuite) TestPostRepositoryImplementation() {
 	t := suite.T()
 	var createdPost *entites.Post
-	t.Run("Create Post", func(t *testing.T) {
+	t.Run("1. Create Post", func(t *testing.T) {
 		creatingPost := entites.NewPost()
 		creatingPost.Title = "Test post"
 		creatingPost.Body = "Body test"
@@ -65,12 +65,30 @@ func (suite *PostRepositoryIntegrationTestSuite) TestFetchPost() {
 		assert.NotNil(t, createdPost.ID)
 	})
 
-	t.Run("Fetch created post by id", func(t *testing.T) {
+	t.Run("2. Fetch created post by id", func(t *testing.T) {
 		p, err := suite.repository.FetchPost(suite.ctx, suite.userId, createdPost.ID)
 		if err != nil {
 			t.Fatal(err)
 		}
 		assert.NotNil(t, p)
 		assert.Equal(t, "Test post", p.Title)
+	})
+
+	t.Run("3. Update a post by id", func(t *testing.T) {
+		p, err := suite.repository.FetchPost(suite.ctx, suite.userId, createdPost.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p.Body = "Updated post body"
+		err = suite.repository.UpdatePostOfUser(suite.ctx, *p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		p, err = suite.repository.FetchPost(suite.ctx, suite.userId, createdPost.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotNil(t, p)
+		assert.Equal(t, "Updated post body", p.Body)
 	})
 }

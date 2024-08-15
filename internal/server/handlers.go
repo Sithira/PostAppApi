@@ -4,6 +4,8 @@ import (
 	"RestApiBackend/infrastructure"
 	http3 "RestApiBackend/internal/features/auth/delivery/http"
 	usecase3 "RestApiBackend/internal/features/auth/usecase"
+	http4 "RestApiBackend/internal/features/comments/delivery/http"
+	repository3 "RestApiBackend/internal/features/comments/repository"
 	http2 "RestApiBackend/internal/features/posts/delivery/http"
 	repository2 "RestApiBackend/internal/features/posts/repository"
 	usecase2 "RestApiBackend/internal/features/posts/usecase"
@@ -19,15 +21,18 @@ func (s *Server) MapHandlers() {
 	// invoke repositories
 	postRepository := repository2.NewPostsRepository(s.db)
 	userRepository := repository.NewUserRepository(s.db)
+	commentsRepository := repository3.NewCommentRepository(s.db)
 
 	// use cases
 	userUc := usecase.NewUserUserCase(userRepository)
 	postUc := usecase2.NewPostUseCase(postRepository)
+	commentUs := repository3.NewCommentsUseCase(commentsRepository, postRepository)
 	authUs := usecase3.NewAuthenticationUseCase(*s.app, userRepository)
 
 	// handlers
 	userHandler := http.NewUserHandler(userUc)
 	postHandler := http2.NewPostHandler(postUc)
+	commentsHandler := http4.NewCommentApiHandler(commentUs)
 	authHandler := http3.NewAuthenticationHandler(authUs)
 
 	// base url of the application
@@ -45,7 +50,11 @@ func (s *Server) MapHandlers() {
 	postsGroup := baseRouter.Group("/api/v1/posts")
 	postsGroup.Use(bearerToken)
 
+	commentsGroup := baseRouter.Group("/api/v1/posts/:postId/comments/")
+	commentsGroup.Use(bearerToken)
+
 	http2.NewPostRouter(postHandler, postsGroup)
+	http4.NewCommentRouter(commentsHandler, commentsGroup)
 	http3.NewAuthRouter(authHandler, baseRouter.Group("/api/auth"))
 }
 
