@@ -36,9 +36,9 @@ func (c commentApiHandler) GetSingleComment() gin.HandlerFunc {
 
 func (c commentApiHandler) GetComments() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		_, user := utils.GetUserDetailsFromContext(context)
+		utils.GetUserDetailsFromContext(context)
 		postUuid, _ := extractParams(context)
-		postList, err := c.uc.FetchCommentsForPost(context, user.ID, *postUuid)
+		postList, err := c.uc.FetchCommentsForPost(context, *postUuid)
 		if err != nil {
 			return
 		}
@@ -70,8 +70,9 @@ func (c commentApiHandler) AddComment() gin.HandlerFunc {
 }
 
 func (c commentApiHandler) UpdateComment() gin.HandlerFunc {
-	//TODO implement me
-	panic("implement me")
+	return func(context *gin.Context) {
+		_, user := utils.GetUserDetailsFromContext(context)
+	}
 }
 
 func (c commentApiHandler) DeleteComment() gin.HandlerFunc {

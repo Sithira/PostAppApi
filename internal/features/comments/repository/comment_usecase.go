@@ -13,11 +13,6 @@ type commentsUseCase struct {
 	postRepo    posts.PostRepository
 }
 
-func (c commentsUseCase) AddCommentForPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, request dto.AddCommentRequest) (*dto.CommentResponse, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func NewCommentsUseCase(cRepo comments.CommentRepository, pRepo posts.PostRepository) comments.UseCase {
 	return &commentsUseCase{
 		commentRepo: cRepo,
@@ -25,22 +20,26 @@ func NewCommentsUseCase(cRepo comments.CommentRepository, pRepo posts.PostReposi
 	}
 }
 
-func (c commentsUseCase) FetchCommentsForPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) (*dto.CommentListResponse, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (c commentsUseCase) FetchComment(ctx context.Context, postId uuid.UUID, commentId uuid.UUID) (*dto.CommentResponse, error) {
+	c.commentRepo.GetComment(ctx, postId, commentId)
+}
+
+func (c commentsUseCase) FetchCommentsForPost(ctx context.Context, postId uuid.UUID) (*dto.CommentListResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c commentsUseCase) UpdateComment(ctx context.Context, postId uuid.UUID, commentId uuid.UUID) error {
+func (c commentsUseCase) UpdateComment(ctx context.Context, userId uuid.UUID, postId uuid.UUID, commentId uuid.UUID) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c commentsUseCase) DeleteComment(ctx context.Context, postId uuid.UUID) {
+func (c commentsUseCase) DeleteComment(ctx context.Context, userId uuid.UUID, postId uuid.UUID) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c commentsUseCase) AddCommentForPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, request dto.AddCommentRequest) (*dto.CommentResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }

@@ -139,7 +139,7 @@ func (p postRepository) UpdatePostOfUser(ctx context.Context, request entites.Po
 func (p postRepository) DeletePostOfUser(ctx context.Context, request entites.Post) error {
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		err := tx.Commit()
+		err := tx.Rollback()
 		if err != nil {
 			return err
 		}

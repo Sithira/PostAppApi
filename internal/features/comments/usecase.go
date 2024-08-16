@@ -7,13 +7,13 @@ import (
 )
 
 type UseCase interface {
-	FetchCommentsForPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) (*dto.CommentListResponse, error)
+	FetchComment(ctx context.Context, postId uuid.UUID, commentId uuid.UUID) (*dto.CommentResponse, error)
+
+	FetchCommentsForPost(ctx context.Context, postId uuid.UUID) (*dto.CommentListResponse, error)
 
 	AddCommentForPost(ctx context.Context, userId uuid.UUID, postId uuid.UUID, request dto.AddCommentRequest) (*dto.CommentResponse, error)
 
-	FetchComment(ctx context.Context, postId uuid.UUID, commentId uuid.UUID) (*dto.CommentResponse, error)
+	UpdateComment(ctx context.Context, userId uuid.UUID, postId uuid.UUID, commentId uuid.UUID) error
 
-	UpdateComment(ctx context.Context, postId uuid.UUID, commentId uuid.UUID) error
-
-	DeleteComment(ctx context.Context, postId uuid.UUID)
+	DeleteComment(ctx context.Context, userId uuid.UUID, postId uuid.UUID)
 }
